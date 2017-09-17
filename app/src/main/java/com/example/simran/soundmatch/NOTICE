@@ -1,0 +1,4 @@
+1. Design inspired by Google Chrome's Guitar Tuner: https://github.com/GoogleChrome/guitar-tuner.
+2. Tarsos package taken from the open source Tarsos DSP project and used in accordance with their license
+(which is placed in the package). That code is unmodified and separated into its own package so there is no
+conflict between the licenses: https://github.com/JorenSix/TarsosDSP.
