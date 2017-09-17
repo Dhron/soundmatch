@@ -4,8 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SoundMatch.iml" filepath="$PROJECT_DIR$/SoundMatch.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/soundmatch-master.iml" filepath="$PROJECT_DIR$/soundmatch-master.iml" />
     </modules>
   </component>
 </project>

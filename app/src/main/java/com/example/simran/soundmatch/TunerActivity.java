@@ -92,11 +92,11 @@ public class TunerActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        new FetchDataTask().execute("https://enigmatic-bayou-80047.herokuapp.com/");
         showCancel = false;
         setContentView(R.layout.tuner_activity);
         tunerFragment = new TunerFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, tunerFragment, TunerFragment.TAG).commit();
-        new FetchDataTask().execute("https://enigmatic-bayou-80047.herokuapp.com/");
     }
 
     @Override

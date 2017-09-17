@@ -7,11 +7,15 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.content.ContextCompat;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import java.util.List;
+
 import com.example.simran.soundmatch.tarsos.PitchDetectionResult;
 import com.example.simran.soundmatch.tarsos.Yin;
 import com.example.simran.soundmatch.utils.AudioUtils;
+
+import java.util.List;
 
 public class Tuner {
     private static final String TAG = Tuner.class.getSimpleName();
@@ -31,6 +35,9 @@ public class Tuner {
     private Context mContext;
     private List<MusicItem> noteList = TunerActivity.wListMusic;
     private int currIndex = 0;
+    private int counter = 0;
+    private String[] lastNotes = new String[8];
+
 
     //provide the tuner view implementing the TunerUpdate to the constructor
     public Tuner(Context context){
@@ -71,6 +78,7 @@ public class Tuner {
     private void findAndPrintNote(){
 
         while(isRecording){
+            final int noteListLength = noteList.size();
             amountRead = audioRecord.read(intermediaryBuffer, 0, readSize);
             buffer = shortArrayToFloatArray(intermediaryBuffer);
             result = yin.getPitch(buffer);
@@ -79,22 +87,69 @@ public class Tuner {
                 @Override
                 public void run() {
                     if (currentNote.getFrequency() != Note.UNKNOWN_FREQUENCY) {
-                        TextView txtView = (TextView) ((Activity) mContext).findViewById(R.id.note_text);
+                        LinearLayout backgroundView = (LinearLayout)
+                                ((Activity) mContext).findViewById(R.id.background);
+                        LinearLayout tunerView = (LinearLayout)
+                                ((Activity) mContext).findViewById(R.id.tuner_view);
+                        TextView txtView = (TextView)
+                                ((Activity) mContext).findViewById(R.id.note_text);
+                        TextView streakView = (TextView)
+                                ((Activity) mContext).findViewById(R.id.streak);
+                        streakView.setText("STREAK: " + Integer.toString(currIndex));
                         String currNote = currentNote.getNote();
+                        Double currFreq = currentNote.getFrequency();
+
                         txtView.setText(currNote);
-                        if (currNote == noteList.get(currIndex).note) {
-                            ++currIndex;
-                            // insert UI
-                        }
-                        else {
-                            currIndex = 0;
-                        }
+                        lastNotes[counter] = currNote;
+                        counter++;
+                        if (counter == 8) {
+                            counter = 0;
+                            if (currIndex == noteListLength) {
+                                return;
+                            } else if (isSameNote(noteList.get(currIndex).note)) {
+                                ++currIndex;
+                                streakView.setText("STREAK: " + Integer.toString(currIndex));
+                            } else {
+                                tunerView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.red));
+                                backgroundView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.red));
+                                streakView.setText("STREAK RESET");
+                                currIndex = 0;
 
+                                final Handler handler = new Handler();
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        LinearLayout backgroundView = (LinearLayout)
+                                                ((Activity) mContext).findViewById(R.id.background);
+                                        LinearLayout tunerView = (LinearLayout)
+                                                ((Activity) mContext).findViewById(R.id.tuner_view);
+                                        TextView txtView = (TextView)
+                                                ((Activity) mContext).findViewById(R.id.note_text);
+                                        TextView streakView = (TextView)
+                                                ((Activity) mContext).findViewById(R.id.streak);
+                                        tunerView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.white));
+                                        backgroundView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.white));
+                                        streakView.setText("STREAK: " + Integer.toString(currIndex));
+                                    }
+                                }, 2000);
 
+                            }
+
+                        }
                     }
                 }
             });
         }
+    }
+
+    private boolean isSameNote(String note) {
+        for(String itm : lastNotes) {
+            if (itm != "" && itm.substring(0,1).equals(note.substring(0,1))) {
+                return true;
+            }
+        }
+        return false;
+
     }
 
     private float[] shortArrayToFloatArray(short[] array){
