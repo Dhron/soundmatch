@@ -34,9 +34,9 @@ public class Tuner {
     private Thread thread;
     private Context mContext;
     private List<MusicItem> noteList = TunerActivity.wListMusic;
-    private int currIndex = 0;
+    public int currIndex = 0;
     private int counter = 0;
-    private String[] lastNotes = new String[8];
+    private String[] lastNotes = new String[6];
 
 
     //provide the tuner view implementing the TunerUpdate to the constructor
@@ -93,28 +93,16 @@ public class Tuner {
                                 ((Activity) mContext).findViewById(R.id.tuner_view);
                         TextView txtView = (TextView)
                                 ((Activity) mContext).findViewById(R.id.note_text);
-                        TextView streakView = (TextView)
-                                ((Activity) mContext).findViewById(R.id.streak);
-                        streakView.setText("STREAK: " + Integer.toString(currIndex));
                         String currNote = currentNote.getNote();
-                        Double currFreq = currentNote.getFrequency();
-
+                        ++counter;
                         txtView.setText(currNote);
-                        lastNotes[counter] = currNote;
-                        counter++;
-                        if (counter == 8) {
-                            counter = 0;
                             if (currIndex == noteListLength) {
                                 return;
-                            } else if (isSameNote(noteList.get(currIndex).note)) {
+                            }
+                            else if (isSameNote(noteList.get(currIndex).note, currNote)) {
                                 ++currIndex;
-                                streakView.setText("STREAK: " + Integer.toString(currIndex));
-                            } else {
-                                tunerView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.red));
-                                backgroundView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.red));
-                                streakView.setText("STREAK RESET");
-                                currIndex = 0;
-
+                                tunerView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.green));
+                                backgroundView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.green));
                                 final Handler handler = new Handler();
                                 handler.postDelayed(new Runnable() {
                                     @Override
@@ -123,33 +111,38 @@ public class Tuner {
                                                 ((Activity) mContext).findViewById(R.id.background);
                                         LinearLayout tunerView = (LinearLayout)
                                                 ((Activity) mContext).findViewById(R.id.tuner_view);
-                                        TextView txtView = (TextView)
-                                                ((Activity) mContext).findViewById(R.id.note_text);
-                                        TextView streakView = (TextView)
-                                                ((Activity) mContext).findViewById(R.id.streak);
                                         tunerView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.white));
                                         backgroundView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.white));
-                                        streakView.setText("STREAK: " + Integer.toString(currIndex));
                                     }
                                 }, 2000);
+
+                            } else {
 
                             }
 
                         }
                     }
-                }
             });
         }
     }
 
-    private boolean isSameNote(String note) {
-        for(String itm : lastNotes) {
-            if (itm != "" && itm.substring(0,1).equals(note.substring(0,1))) {
-                return true;
-            }
+    private boolean isSameNote(String note, String currNote) {
+
+        if ((note != "" || currNote != "") && note.substring(0, 1).equals(currNote.substring(0, 1))) {
+            return true;
         }
         return false;
 
+    }
+
+    public void updateScore() {
+        TextView txtView = (TextView)
+                ((Activity) mContext).findViewById(R.id.note_text);
+
+        double result = ((double)currIndex / 26) * 100;
+        String s = String.format("%.2f", result);
+        txtView.setText("Congrats, you got " + s + "% correct!");
+        txtView.setTextSize(40);
     }
 
     private float[] shortArrayToFloatArray(short[] array){

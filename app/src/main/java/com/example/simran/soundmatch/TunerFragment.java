@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.example.simran.soundmatch.utils.PermissionUtils;
 
@@ -22,6 +23,15 @@ public class TunerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState){
         View v = inflater.inflate(R.layout.tuner_fragment, parent, false);
+
+        final Button button = (Button)v.findViewById(R.id.stop_button);
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                tuner.updateScore();
+                tuner.stop();
+                button.setVisibility(View.GONE);
+            }
+        });
 
         return v;
     }
@@ -45,6 +55,7 @@ public class TunerFragment extends Fragment {
             tuner.stop();
         }
     }
+
 
     @Override
     public void onDestroy(){
